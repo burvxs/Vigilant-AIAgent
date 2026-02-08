@@ -5,7 +5,11 @@ import pandas as pd
 from datetime import datetime
 from dotenv import load_dotenv
 from pathlib import Path
-from twilio.rest import Client
+
+try:
+    from twilio.rest import Client
+except ImportError:
+    Client = None  # Not needed in SIMULATOR_MODE
 
 # ── Configuration ────────────────────────────────────────────────────────────
 
@@ -22,10 +26,29 @@ SAFETY_MODE = True
 # When True, sends only ONE SMS with a summary of the worst finding, saving Twilio credits.
 TEST_CHEAP_MODE = True
 
-twilio_client = Client(TWILIO_SID, TWILIO_TOKEN)
+# When True, writes SMS to sms_outbox.json instead of calling Twilio.
+# No Twilio account needed. Use sms_simulator.py to view messages.
+SIMULATOR_MODE = True
+
+# Simulator doesn't send real SMS, so safety mode is irrelevant — disable it
+# to keep outbox phone numbers consistent with pending_fixes.json keys.
+if SIMULATOR_MODE:
+    SAFETY_MODE = False
 
 BASE_DIR = Path(__file__).parent
 PENDING_FILE = BASE_DIR / "pending_fixes.json"
+OUTBOX_FILE = BASE_DIR / "sms_outbox.json"
+
+# Lazy Twilio client — only created when actually sending real SMS
+_twilio_client = None
+
+def _get_twilio_client():
+    global _twilio_client
+    if _twilio_client is None:
+        if Client is None:
+            raise RuntimeError("twilio package not installed. Install it or use SIMULATOR_MODE.")
+        _twilio_client = Client(TWILIO_SID, TWILIO_TOKEN)
+    return _twilio_client
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -45,9 +68,45 @@ def build_phonebook(staff_csv: Path) -> dict:
     return dict(zip(df["Full Name"].str.strip(), df["Mobile Number"].astype(str).str.strip()))
 
 
-def send_sms(to_number: str, body: str) -> str:
-    """Send an SMS via Twilio. Returns the message SID."""
-    message = twilio_client.messages.create(
+# ── Simulator Outbox ─────────────────────────────────────────────────────────
+
+def load_outbox() -> list:
+    """Load existing outbox messages. Returns empty list if file doesn't exist."""
+    if not OUTBOX_FILE.exists():
+        return []
+    with open(OUTBOX_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_to_outbox(to_number: str, body: str, staff_name: str = "Unknown") -> str:
+    """Write an SMS to the local outbox file. Returns a fake SID."""
+    outbox = load_outbox()
+    fake_sid = f"SIM{int(time.time() * 1000)}{len(outbox):04d}"
+    outbox.append({
+        "sid": fake_sid,
+        "from": TWILIO_FROM or "+61400000000",
+        "to": to_number,
+        "body": body,
+        "staff_name": staff_name,
+        "direction": "outbound",
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    })
+    with open(OUTBOX_FILE, "w", encoding="utf-8") as f:
+        json.dump(outbox, f, indent=2, ensure_ascii=False)
+    return fake_sid
+
+
+# ── SMS Sending ──────────────────────────────────────────────────────────────
+
+def send_sms(to_number: str, body: str, staff_name: str = "Unknown") -> str:
+    """Send an SMS via Twilio, or write to outbox in simulator mode."""
+    if SIMULATOR_MODE:
+        sid = save_to_outbox(to_number, body, staff_name)
+        print(f"  [SIM] Written to sms_outbox.json (SID={sid})")
+        return sid
+
+    client = _get_twilio_client()
+    message = client.messages.create(
         body=body,
         from_=TWILIO_FROM,
         to=to_number,
@@ -116,8 +175,12 @@ def main():
     error_count = 0
     state_count = 0
 
-    if SAFETY_MODE:
+    if SIMULATOR_MODE:
+        print(f"[SIM] SIMULATOR MODE ON — SMS written to sms_outbox.json (no Twilio)")
+        print(f"[SIM] Run: python3 sms_simulator.py   to view messages\n")
+    elif SAFETY_MODE:
         print(f"⚠️  SAFETY MODE ON — all SMS routed to TEST_PHONE_NUMBER ({TEST_NUMBER})")
+
     if TEST_CHEAP_MODE:
         print(f"💰 CHEAP MODE ON — sending 1 summary SMS only\n")
     else:
@@ -177,12 +240,12 @@ def main():
         summary_lines.append(f"Sample: {worst['sms_body'][:100]}")
 
         body = "\n".join(summary_lines)
-        destination = to_e164(TEST_NUMBER)
+        destination = worst["e164"] if SIMULATOR_MODE else to_e164(TEST_NUMBER)
 
         try:
-            sid = send_sms(destination, body)
+            sid = send_sms(destination, body, staff_name="SUMMARY")
             sent_count = 1
-            print(f"\n[SMS SENT] Summary to TEST_NUMBER ({destination}):")
+            print(f"\n[SMS SENT] Summary ({destination}):")
             print(f"  {body}\n")
             log_sms("CHEAP_MODE_SUMMARY", destination, body, sid, log_path)
         except Exception as e:
@@ -193,11 +256,13 @@ def main():
 
     elif not TEST_CHEAP_MODE:
         for f in flagged:
-            destination = to_e164(TEST_NUMBER) if SAFETY_MODE else f["e164"]
-            mode_label = "Test Mode" if SAFETY_MODE else "LIVE"
+            destination = f["e164"] if SIMULATOR_MODE else (
+                to_e164(TEST_NUMBER) if SAFETY_MODE else f["e164"])
+            mode_label = "Simulator" if SIMULATOR_MODE else (
+                "Test Mode" if SAFETY_MODE else "LIVE")
 
             try:
-                sid = send_sms(destination, f["sms_body"])
+                sid = send_sms(destination, f["sms_body"], staff_name=f["staff"])
                 sent_count += 1
                 print(f'[SMS SENT] To {f["staff"]} ({mode_label}): "{f["sms_body"][:70]}..."')
                 log_sms(f["staff"], destination, f["sms_body"], sid, log_path)

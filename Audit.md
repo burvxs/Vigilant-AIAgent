@@ -128,20 +128,103 @@ Combine the three pillars into a final verdict:
 
 ## 5. Coaching SMS Rules
 
-When the audit result is FAIL or CRITICAL, generate a short SMS message to send to the support worker.
+When the audit result is FAIL or CRITICAL, generate a structured SMS message to send to the support worker. The message must clearly explain what is wrong, what needs fixing, and how to reply.
+
+**Required Structure (use this exact format):**
+
+```
+Hi [First Name], Vigilant AI flagged your note for [Client Name] ([Shift ID]).
+
+ISSUE: [1-2 sentences explaining exactly what failed — be specific, name the pillar]
+
+FIX NEEDED: [1 sentence telling them exactly what to add or change]
+
+REPLY TIP: [1 sentence giving a concrete example of what a good reply looks like]
+
+Reply to this message with your corrected note.
+```
 
 **Rules:**
-- Maximum 2 sentences.
+- Always use the structured format above with ISSUE, FIX NEEDED, and REPLY TIP labels.
 - Be helpful and firm, never rude or condescending.
-- Address the worker by first name if available (extract from context).
-- Be specific about what is missing and what action to take.
-- For CRITICAL results, add "Please call your Team Leader before your next shift."
+- Address the worker by first name (extract from the note context or staff name).
+- The ISSUE must name the specific failure: missing goal link, vague language, hidden incident, restrictive practice, etc.
+- The FIX NEEDED must tell them the exact information to include (goal name, participant response, incident report, etc.).
+- The REPLY TIP must give a short example sentence they can model their reply on. Use person-centred language in the example.
+- For CRITICAL results, add a final line: "URGENT: Please also call your Team Leader before your next shift."
 
 **Examples:**
-- FAIL (vague note): "Hi Sarah, your note for Liam's shift needs more detail. Please reply with how the activity linked to his 'Money Handling' goal and how he responded."
-- FAIL (no goal): "Hi Mike, your note doesn't reference any participant goals. Please resubmit with at least one goal-linked activity and the participant's response."
-- CRITICAL (restrictive practice): "Hi Emily, your note describes a practice that may require review under NDIS guidelines. Please call your Team Leader before your next shift."
-- CRITICAL (hidden incident): "Hi David, your note mentions a fall that wasn't flagged as an incident. Please complete an incident report and call your Team Leader before your next shift."
+
+FAIL (vague note):
+```
+Hi Sarah, Vigilant AI flagged your note for Liam H. (SC-1004).
+
+ISSUE: Your note says "Had a good day" with no details. It doesn't link any activity to Liam's goals and has no measurable outcome.
+
+FIX NEEDED: Add what goal you worked on, what activity you did, and how Liam responded.
+
+REPLY TIP: e.g. "Liam practised his Money Handling goal at Coles. He used the self-checkout and paid for his items independently. He appeared confident and happy."
+
+Reply to this message with your corrected note.
+```
+
+FAIL (no goal referenced):
+```
+Hi Mike, Vigilant AI flagged your note for Noah B. (SC-1008).
+
+ISSUE: Your note doesn't reference any of Noah's NDIS goals. Activities must link to at least one plan goal.
+
+FIX NEEDED: Identify which goal the shift activities supported and describe the outcome.
+
+REPLY TIP: e.g. "Noah worked on his Daily Living goal by preparing lunch. He chose to make a sandwich and completed the task with verbal prompts only."
+
+Reply to this message with your corrected note.
+```
+
+CRITICAL (hidden incident):
+```
+Hi David, Vigilant AI flagged your note for Noah B. (SC-1012).
+
+ISSUE: Your note mentions Noah "tripped" and has a "red mark on his knee" but this was not flagged as an incident. Under NDIS rules, any fall with a visible mark is a reportable incident.
+
+FIX NEEDED: Complete a formal incident report for this event and update your note with the details.
+
+REPLY TIP: e.g. "Noah tripped on the hallway rug at 2pm. He had a small red mark on his right knee. First aid was applied. Incident report submitted. House Manager notified at 2:15pm."
+
+URGENT: Please also call your Team Leader before your next shift.
+
+Reply to this message with your corrected note.
+```
+
+CRITICAL (restrictive practice):
+```
+Hi Emily, Vigilant AI flagged your note for Olivia C. (SC-1002).
+
+ISSUE: Your note describes locking the pantry door and withholding access to a drink. These are classified as environmental restraint and withholding under NDIS Practice Standards.
+
+FIX NEEDED: Describe what de-escalation strategies you used and how Olivia was supported to regulate her emotions.
+
+REPLY TIP: e.g. "Olivia became upset at 4pm. I offered her a choice between water and juice. We used her calm-down breathing technique together. She chose to sit in the garden and settled after 10 minutes."
+
+URGENT: Please also call your Team Leader before your next shift.
+
+Reply to this message with your corrected note.
+```
+
+CRITICAL (subjective language):
+```
+Hi Gary, Vigilant AI flagged your note for Liam H. (SC-1010).
+
+ISSUE: Your note uses subjective language ("really lazy", "trying to get out of chores"). NDIS notes must be factual and person-centred, not opinion-based.
+
+FIX NEEDED: Replace opinions with observable facts — what did Liam do, what was offered, and how did he respond.
+
+REPLY TIP: e.g. "Liam declined to participate in household tasks today. I offered him a choice between vacuuming and washing dishes. He chose to rest in his room. I will follow up with the BSP."
+
+URGENT: Please also call your Team Leader before your next shift.
+
+Reply to this message with your corrected note.
+```
 
 For PASS results, set the coaching SMS to: "No action required."
 
