@@ -1,4 +1,6 @@
 import os
+import json
+import time
 import pandas as pd
 from datetime import datetime
 from dotenv import load_dotenv
@@ -23,6 +25,7 @@ TEST_CHEAP_MODE = True
 twilio_client = Client(TWILIO_SID, TWILIO_TOKEN)
 
 BASE_DIR = Path(__file__).parent
+PENDING_FILE = BASE_DIR / "pending_fixes.json"
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -59,6 +62,40 @@ def log_sms(staff: str, number: str, body: str, sid: str, log_path: Path):
     with open(log_path, "a", encoding="utf-8") as f:
         f.write(entry)
 
+
+# ── State Management ─────────────────────────────────────────────────────────
+
+def load_pending() -> dict:
+    """Load existing pending fixes. Returns empty dict if file doesn't exist."""
+    if not PENDING_FILE.exists():
+        return {}
+    with open(PENDING_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_pending(pending: dict):
+    """Write pending fixes to JSON immediately."""
+    with open(PENDING_FILE, "w", encoding="utf-8") as f:
+        json.dump(pending, f, indent=2, ensure_ascii=False)
+
+
+def record_pending_fix(pending: dict, phone: str, staff: str, client: str,
+                       shift_id: str, score: str, risk: str, sms_body: str):
+    """Add or update a pending fix entry and save to disk immediately."""
+    pending[phone] = {
+        "staff_name": staff,
+        "client": client,
+        "shift_id": shift_id,
+        "audit_score": score,
+        "risk_level": risk,
+        "coaching_sms": sms_body,
+        "status": "AWAITING_REPLY",
+        "timestamp": int(time.time()),
+    }
+    save_pending(pending)
+    print(f"[SAVED STATE] Pending fix recorded for {staff} ({phone})")
+
+
 # ── Main Logic ───────────────────────────────────────────────────────────────
 
 def main():
@@ -68,10 +105,16 @@ def main():
 
     report = pd.read_csv(report_path)
     phonebook = build_phonebook(staff_path)
+    pending = load_pending()
+
+    existing_count = len(pending)
+    if existing_count:
+        print(f"Loaded {existing_count} existing pending fix(es) from previous runs.")
 
     sent_count = 0
     skipped_count = 0
     error_count = 0
+    state_count = 0
 
     if SAFETY_MODE:
         print(f"⚠️  SAFETY MODE ON — all SMS routed to TEST_PHONE_NUMBER ({TEST_NUMBER})")
@@ -89,6 +132,8 @@ def main():
         score = str(row.get("audit_score", "")).strip().upper()
         risk = str(row.get("risk_level", "")).strip().upper()
         sms_body = str(row.get("coaching_sms", "")).strip()
+        client = str(row.get("Client", "")).strip()
+        shift_id = str(row.get("Shift ID", f"Row-{idx}")).strip()
 
         if score not in ("FAIL", "CRITICAL") and risk != "HIGH":
             skipped_count += 1
@@ -104,13 +149,20 @@ def main():
             skipped_count += 1
             continue
 
+        e164_number = to_e164(real_number)
+
+        # ── Save state for EVERY flagged row (regardless of cheap mode) ──
+        record_pending_fix(pending, e164_number, staff, client,
+                           shift_id, score, risk, sms_body)
+        state_count += 1
+
         flagged.append({"staff": staff, "score": score, "risk": risk,
-                        "sms_body": sms_body, "real_number": real_number})
+                        "sms_body": sms_body, "real_number": real_number,
+                        "e164": e164_number})
 
     # ── Send SMS ─────────────────────────────────────────────────────────────
 
     if TEST_CHEAP_MODE and flagged:
-        # Build a single summary SMS from all flagged rows
         score_counts = {}
         for f in flagged:
             score_counts[f["score"]] = score_counts.get(f["score"], 0) + 1
@@ -119,7 +171,6 @@ def main():
         for verdict, count in sorted(score_counts.items()):
             summary_lines.append(f"- {verdict}: {count}")
 
-        # Pick the worst row as a sample
         worst = next((f for f in flagged if f["score"] == "CRITICAL"),
                      next((f for f in flagged if f["score"] == "FAIL"), flagged[0]))
         summary_lines.append(f"Worst: {worst['staff']} ({worst['score']}/{worst['risk']})")
@@ -131,7 +182,7 @@ def main():
         try:
             sid = send_sms(destination, body)
             sent_count = 1
-            print(f"[SMS SENT] Summary to TEST_NUMBER ({destination}):")
+            print(f"\n[SMS SENT] Summary to TEST_NUMBER ({destination}):")
             print(f"  {body}\n")
             log_sms("CHEAP_MODE_SUMMARY", destination, body, sid, log_path)
         except Exception as e:
@@ -142,7 +193,7 @@ def main():
 
     elif not TEST_CHEAP_MODE:
         for f in flagged:
-            destination = to_e164(TEST_NUMBER) if SAFETY_MODE else to_e164(f["real_number"])
+            destination = to_e164(TEST_NUMBER) if SAFETY_MODE else f["e164"]
             mode_label = "Test Mode" if SAFETY_MODE else "LIVE"
 
             try:
@@ -156,9 +207,10 @@ def main():
 
     # ── Summary ──────────────────────────────────────────────────────────────
 
-    print(f"\n{'='*50}")
+    print(f"{'='*50}")
     print(f"Sent {sent_count} SMS alert(s).")
     print(f"Flagged {len(flagged)} notes total.")
+    print(f"State saved: {state_count} pending fix(es) in pending_fixes.json")
     print(f"Skipped {skipped_count} compliant/empty notes.")
     if error_count:
         print(f"Errors: {error_count} (check logs).")

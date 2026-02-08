@@ -1,7 +1,52 @@
 {
-  "+61412345678": {"shift_id": "SC-1005", "staff_name": "Sarah Jenkins", "client": "Olivia C. (Participant)", "goal": "Money Handling, Independence"},
-  "+61423456789": {"shift_id": "SC-1004", "staff_name": "Mike Ross", "client": "Noah B. (Participant)", "goal": "Daily Living"},
-  "+61434567890": {"shift_id": "SC-1012", "staff_name": "David Kim", "client": "Noah B. (Participant)", "goal": "Daily Living"},
-  "+61445678901": {"shift_id": "SC-1000", "staff_name": "Emily Blunt", "client": "Liam H. (Participant)", "goal": "Health & Wellbeing"},
-  "+61456789012": {"shift_id": "SC-1009", "staff_name": "Gary Oldman", "client": "Olivia C. (Participant)", "goal": "Daily Living"}
+  "+61412345678": {
+    "staff_name": "Sarah Jenkins",
+    "client": "Noah B. (Participant)",
+    "shift_id": "SC-1014",
+    "audit_score": "CRITICAL",
+    "risk_level": "LOW",
+    "coaching_sms": "Hi, your note contains subjective judgements that don't meet NDIS standards. Please resubmit describing what Liam chose to do and how it linked to his Daily Living goal.",
+    "status": "AWAITING_REPLY",
+    "timestamp": 1770544588
+  },
+  "+61423456789": {
+    "staff_name": "Mike Ross",
+    "client": "Liam H. (Participant)",
+    "shift_id": "SC-1016",
+    "audit_score": "CRITICAL",
+    "risk_level": "HIGH",
+    "coaching_sms": "Hi, your note describes practices that require immediate review under NDIS guidelines. Please call your Team Leader before your next shift.",
+    "status": "AWAITING_REPLY",
+    "timestamp": 1770544588
+  },
+  "+61434567890": {
+    "staff_name": "David Kim",
+    "client": "Liam H. (Participant)",
+    "shift_id": "SC-1018",
+    "audit_score": "CRITICAL",
+    "risk_level": "MEDIUM",
+    "coaching_sms": "Hi, your note mentions Noah refused his BP medication but this wasn't flagged as an incident. Please complete an incident report and call your Team Leader before your next shift.",
+    "status": "AWAITING_REPLY",
+    "timestamp": 1770544588
+  },
+  "+61445678901": {
+    "staff_name": "Emily Blunt",
+    "client": "Noah B. (Participant)",
+    "shift_id": "SC-1017",
+    "audit_score": "CRITICAL",
+    "risk_level": "HIGH",
+    "coaching_sms": "Hi there, your note describes practices that require immediate review under NDIS guidelines. Please call your Team Leader before your next shift.",
+    "status": "AWAITING_REPLY",
+    "timestamp": 1770544588
+  },
+  "+61456789012": {
+    "staff_name": "Gary Oldman",
+    "client": "Noah B. (Participant)",
+    "shift_id": "SC-1005",
+    "audit_score": "CRITICAL",
+    "risk_level": "LOW",
+    "coaching_sms": "Hi there, your note fails multiple NDIS standards - no goals referenced, vague language, and no participant choice documented. Please call your Team Leader before your next shift.",
+    "status": "AWAITING_REPLY",
+    "timestamp": 1770544588
+  }
 }
