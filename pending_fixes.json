@@ -1,0 +1,7 @@
+{
+  "+61412345678": {"shift_id": "SC-1005", "staff_name": "Sarah Jenkins", "client": "Olivia C. (Participant)", "goal": "Money Handling, Independence"},
+  "+61423456789": {"shift_id": "SC-1004", "staff_name": "Mike Ross", "client": "Noah B. (Participant)", "goal": "Daily Living"},
+  "+61434567890": {"shift_id": "SC-1012", "staff_name": "David Kim", "client": "Noah B. (Participant)", "goal": "Daily Living"},
+  "+61445678901": {"shift_id": "SC-1000", "staff_name": "Emily Blunt", "client": "Liam H. (Participant)", "goal": "Health & Wellbeing"},
+  "+61456789012": {"shift_id": "SC-1009", "staff_name": "Gary Oldman", "client": "Olivia C. (Participant)", "goal": "Daily Living"}
+}

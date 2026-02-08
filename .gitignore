@@ -1,0 +1,5 @@
+.env
+*.log
+__pycache__/
+shiftcare_messy_export.csv
+vigilant_audit_report.csv
