@@ -6,8 +6,10 @@
     "audit_score": "CRITICAL",
     "risk_level": "LOW",
     "coaching_sms": "Hi there, Vigilant AI flagged your note for Liam's shift (Daily Living goal). ISSUE: Your note uses subjective language ('really lazy', 'trying to get out of chores'). NDIS notes must be factual and person-centred, not opinion-based. FIX NEEDED: Replace opinions with observable facts — what did Liam do, what was offered, and how did he respond. REPLY TIP: e.g. 'Liam declined to participate in household tasks today. I offered him a choice between vacuuming and washing dishes. He chose to rest in his room. I will follow up with the BSP.' URGENT: Please also call your Team Leader before your next shift. Reply to this message with your corrected note.",
-    "status": "AWAITING_REPLY",
-    "timestamp": 1770549951
+    "status": "FIX_RECEIVED",
+    "timestamp": 1770635496,
+    "fix_received": "Noah declined his BP tablet at 7pm citing taste concerns. House Manager notified at 7:15pm. Incident report completed. Will discuss alternative formulation with GP tomorrow.",
+    "fix_timestamp": 1770635765
   },
   "+61423456789": {
     "staff_name": "Mike Ross",
@@ -17,7 +19,7 @@
     "risk_level": "HIGH",
     "coaching_sms": "Hi there, Vigilant AI flagged your note for Olivia (current shift). ISSUE: Your note describes locking the pantry door and withholding access to a drink. These are classified as environmental restraint and withholding under NDIS Practice Standards. FIX NEEDED: Describe what de-escalation strategies you used and how Olivia was supported to regulate her emotions. REPLY TIP: e.g. \"Olivia became upset at 4pm. I offered her a choice between water and juice. We used her calm-down breathing technique together. She chose to sit in the garden and settled after 10 minutes.\" URGENT: Please also call your Team Leader before your next shift. Reply to this message with your corrected note.",
     "status": "AWAITING_REPLY",
-    "timestamp": 1770549951
+    "timestamp": 1770635496
   },
   "+61434567890": {
     "staff_name": "David Kim",
@@ -27,7 +29,7 @@
     "risk_level": "HIGH",
     "coaching_sms": "Hi there, Vigilant AI flagged your note for Noah's shift. ISSUE: Noah refused his blood pressure medication but this was not flagged as an incident. Under NDIS rules, any medication refusal must be reported immediately as it affects his Health & Wellbeing goal. FIX NEEDED: Complete a formal incident report and document what alternative strategies were offered and who was notified. REPLY TIP: e.g. 'Noah declined his BP tablet at 7pm. I offered it with juice but he still refused. GP notified at 7:15pm. Incident report completed. House Manager advised.' URGENT: Please also call your Team Leader before your next shift. Reply to this message with your corrected note.",
     "status": "AWAITING_REPLY",
-    "timestamp": 1770549951
+    "timestamp": 1770635496
   },
   "+61445678901": {
     "staff_name": "Emily Blunt",
@@ -36,8 +38,10 @@
     "audit_score": "CRITICAL",
     "risk_level": "MEDIUM",
     "coaching_sms": "Hi there, Vigilant AI flagged your note for Noah (shift today). ISSUE: Your note mentions Noah 'tripped' and has a 'red mark on his knee' but this was not flagged as an incident. Under NDIS rules, any fall with a visible mark is a reportable incident. FIX NEEDED: Complete a formal incident report for this event and update your note with the details. REPLY TIP: e.g. 'Noah tripped on the hallway rug at 2pm. He had a small red mark on his right knee. First aid was applied. Incident report submitted. House Manager notified at 2:15pm.' URGENT: Please also call your Team Leader before your next shift. Reply to this message with your corrected note.",
-    "status": "AWAITING_REPLY",
-    "timestamp": 1770549951
+    "status": "FIX_RECEIVED",
+    "timestamp": 1770635496,
+    "fix_received": "Noah tripped on the hallway rug at 2pm. He had a small red mark on his right knee. First aid was applied",
+    "fix_timestamp": 1770635838
   },
   "+61456789012": {
     "staff_name": "Gary Oldman",
@@ -46,7 +50,9 @@
     "audit_score": "CRITICAL",
     "risk_level": "LOW",
     "coaching_sms": "Hi there, Vigilant AI flagged your note for Liam's shift. ISSUE: Your note says 'Had a good day' with no goal reference, no measurable activities, and no participant choice documented. The goals field is empty with no explanation why. FIX NEEDED: Add what specific activities Liam chose to do, which NDIS goal they supported, and how he responded or engaged. REPLY TIP: e.g. 'Liam chose to visit the local park to work on his Community Access goal. He navigated the playground equipment independently and appeared confident throughout the outing.' Reply to this message with your corrected note.",
-    "status": "AWAITING_REPLY",
-    "timestamp": 1770549951
+    "status": "FIX_RECEIVED",
+    "timestamp": 1770635496,
+    "fix_received": "Noah tripped on the hallway rug at 2pm. He had a small red mark on his right knee. First aid was applied. Incident report submitted. House Manager notified at 2:15pm.",
+    "fix_timestamp": 1770635611
   }
 }
